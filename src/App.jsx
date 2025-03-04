@@ -1,39 +1,81 @@
-import React, { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import styles from './App.module.css';
+import data from '../src/utils/data.json';
 
-function App() {
-    const [count, setCount] = useState(0);
+const App = () => {
+    const [steps, setSteps] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    useEffect(() => {
+        const stepsComponents = data.map((item) => (
+            <div key={item.id}>
+                <h2>{item.title}</h2>
+                <p>{item.content}</p>
+            </div>
+        ));
+        setSteps(stepsComponents);
+    }, []);
+
+    const handleClickBack = () => setActiveIndex((prevIndex) => prevIndex - 1);
+    const handleClickNext = () => setActiveIndex((prevIndex) => prevIndex + 1);
+    const handleClickRestart = () => setActiveIndex(0);
+
+    const isFirstStep = activeIndex === 0;
+    const isLastStep = activeIndex === steps.length - 1;
 
     return (
-        <>
-            <div>
-                <a href="https://vite.dev" target="_blank" rel="noreferrer">
-                    <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank" rel="noreferrer">
-                    <img
-                        src={reactLogo}
-                        className="logo react"
-                        alt="React logo"
-                    />
-                </a>
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <h1>Инструкция по готовке пельменей</h1>
+                <div className={styles.steps}>
+                    <div className={styles['steps-content']}>
+                        {steps[activeIndex]}
+                    </div>
+                    <ul className={styles['steps-list']}>
+                        {steps.map((step, index) => {
+                            const liClass = `${styles['steps-item']} ${
+                                index < activeIndex
+                                    ? styles.done
+                                    : index === activeIndex
+                                    ? `${styles.done} ${styles.active}`
+                                    : ''
+                            }`;
+                            return (
+                                <li className={liClass} key={index}>
+                                    <button
+                                        className={styles['steps-item-button']}
+                                        onClick={() => setActiveIndex(index)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                    Шаг {index + 1}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    <div className={styles['buttons-container']}>
+                        <button
+                            className={styles.button}
+                            onClick={handleClickBack}
+                            disabled={isFirstStep}
+                        >
+                            Назад
+                        </button>
+                        <button
+                            className={styles.button}
+                            onClick={
+                                isLastStep
+                                    ? handleClickRestart
+                                    : handleClickNext
+                            }
+                        >
+                            {isLastStep ? 'Начать сначала' : 'Далее'}
+                        </button>
+                    </div>
+                </div>
             </div>
-            <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p>
-                    Edit <code>src/App.jsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className="read-the-docs">
-                Click on the Vite and React logos to learn more
-            </p>
-        </>
+        </div>
     );
-}
+};
 
 export default App;
