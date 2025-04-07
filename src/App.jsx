@@ -1,27 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './App.module.css';
 import data from '../src/utils/data.json';
 
 const App = () => {
-    const [steps, setSteps] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
 
-    useEffect(() => {
-        const stepsComponents = data.map((item) => (
-            <div key={item.id}>
-                <h2>{item.title}</h2>
-                <p>{item.content}</p>
-            </div>
-        ));
-        setSteps(stepsComponents);
-    }, []);
-
-    const handleClickBack = () => setActiveIndex((prevIndex) => prevIndex - 1);
-    const handleClickNext = () => setActiveIndex((prevIndex) => prevIndex + 1);
+    const handleClickBack = () => setActiveIndex((prev) => prev - 1);
+    const handleClickNext = () => setActiveIndex((prev) => prev + 1);
     const handleClickRestart = () => setActiveIndex(0);
 
     const isFirstStep = activeIndex === 0;
-    const isLastStep = activeIndex === steps.length - 1;
+    const isLastStep = activeIndex === data.length - 1;
 
     return (
         <div className={styles.container}>
@@ -29,10 +18,13 @@ const App = () => {
                 <h1>Инструкция по готовке пельменей</h1>
                 <div className={styles.steps}>
                     <div className={styles['steps-content']}>
-                        {steps[activeIndex]}
+                        <div key={data[activeIndex].id}>
+                            <h2>{data[activeIndex].title}</h2>
+                            <p>{data[activeIndex].content}</p>
+                        </div>
                     </div>
                     <ul className={styles['steps-list']}>
-                        {steps.map((step, index) => {
+                        {data.map((step, index) => {
                             const liClass = `${styles['steps-item']} ${
                                 index < activeIndex
                                     ? styles.done
@@ -41,7 +33,7 @@ const App = () => {
                                     : ''
                             }`;
                             return (
-                                <li className={liClass} key={index}>
+                                <li className={liClass} key={step.id}>
                                     <button
                                         className={styles['steps-item-button']}
                                         onClick={() => setActiveIndex(index)}
